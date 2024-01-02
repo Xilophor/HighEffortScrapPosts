@@ -1,5 +1,11 @@
-﻿using BepInEx;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using BepInEx;
 using BepInEx.Logging;
+using HarmonyLib;
+using UnityEngine;
 
 namespace HighEffortScrapPosts;
 
@@ -11,7 +17,11 @@ public class Plugin : BaseUnityPlugin
         Instance = this;
         Logger = base.Logger;
         
+        Logger.LogDebug("Loading Assets...");
         
+        LoadAllAssets();
+        
+        Assets.Do(asset => Logger.LogDebug(asset.name));
     }
 
     private void OnEnable()
@@ -24,6 +34,23 @@ public class Plugin : BaseUnityPlugin
         
     }
 
-    internal static Plugin Instance;
+    private void LoadAllAssets()
+    {
+        var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+
+        resourceNames.Do(name => Logger.LogDebug(name));
+        
+        var assetBundles = resourceNames
+            .Where(i => i.StartsWith("HighEffortScrapPosts.assets"))
+            .Select(i => AssetBundle.LoadFromStream(Assembly
+                .GetExecutingAssembly().GetManifestResourceStream(i)))
+            .ToList();
+
+        Assets = assetBundles.SelectMany(i => i.LoadAllAssets()).ToList();
+    }
+
+    internal static Plugin Instance; 
     internal new static ManualLogSource Logger;
+
+    internal static List<Object> Assets;
 }

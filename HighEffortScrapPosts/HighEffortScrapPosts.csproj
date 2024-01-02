@@ -34,6 +34,12 @@
         <Content Include="HighEffortScrapPosts.csproj.user" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="assets\" />
+        <None Remove="assets\*" />
+        <EmbeddedResource Include="assets\*" />
+    </ItemGroup>
+
     <Target Name="CopyFiles" AfterTargets="PostBuildEvent">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\UnityProject\Assets\Plugins" />
     </Target>
