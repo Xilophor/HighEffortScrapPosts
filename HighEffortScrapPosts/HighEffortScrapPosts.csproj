@@ -33,4 +33,8 @@
     <ItemGroup>
         <Content Include="HighEffortScrapPosts.csproj.user" />
     </ItemGroup>
+
+    <Target Name="CopyFiles" AfterTargets="PostBuildEvent">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\UnityProject\Assets\Plugins" />
+    </Target>
 </Project>

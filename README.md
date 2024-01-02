@@ -22,3 +22,17 @@ This project uses custom variables in `HighEffortScrapPosts.csproj.user`. Below 
 ```
 
 `ExportDirectory` is only useful if you want to have the built files automatically put into your `plugins` folder.
+
+---
+
+The unity project will need the following game assemblies:
+
+- Assembly-CSharp-firstpass.dll
+- AmazingAssets.TerrainToMesh.dll
+- ClientNetworkTransform.dll
+- DissonanceVoip.dll
+- Facepunch.Steamworks.Win64.dll
+- Facepunch Transport for Netcode for GameObjects.dll
+- Newtonsoft.Json.dll
+
+Copy these assemblies to the `UnityProject\Assets\Plugins` folder.
