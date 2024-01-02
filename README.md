@@ -1,4 +1,4 @@
-﻿# High Effort Scrap-Posts
+﻿# High Effort ScrapPosts
 
 ## Contributing
 
