@@ -2,7 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <AssemblyName>HighEffortScrapPosts</AssemblyName>
+        <AssemblyName>xilophor.lc.HighEffortScrapPosts</AssemblyName>
+        <Product>HighEffortScrapPosts</Product>
         <Description>We spend too much time on the computer.</Description>
         <Version>1.0.0</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -11,13 +12,10 @@
 
     <ItemGroup>
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all"/>
-        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="BepInEx.Core" Version="5.*"/>
-        <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*"/>
-        <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile"/>
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+        <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all"//>
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" PrivateAssets="all"//>
+        <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" PrivateAssets="all"//>
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -25,13 +23,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="Assembly-CSharp" Publicize="true">
+        <Reference Include="Assembly-CSharp" Publicize="true" PrivateAssets="all"/>
             <HintPath>$(DependenciesDirectory)\Assembly-CSharp.dll</HintPath>
         </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="HighEffortScrapPosts.csproj.user" />
     </ItemGroup>
 
     <ItemGroup>
