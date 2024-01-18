@@ -2,30 +2,46 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <AssemblyName>xilophor.lc.HighEffortScrapPosts</AssemblyName>
+        <AssemblyName>bmx.lc.HighEffortScrapPosts</AssemblyName>
         <Product>HighEffortScrapPosts</Product>
         <Description>We spend too much time on the computer.</Description>
-        <Version>1.0.0</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
+        <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>embedded</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all"/>
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
-        <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all"//>
-        <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" PrivateAssets="all"//>
-        <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" PrivateAssets="all"//>
+        <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all"/>
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" PrivateAssets="all"/>
+        <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" PrivateAssets="all"/>
+        <PackageReference Include="Evaisa.LethalLib" Version="0.*" PrivateAssets="all"/>
+        <PackageReference Include="Evaisa.NetcodePatcher.MSBuild" Version="3.*" PrivateAssets="all"/>
+        <PackageReference Include="MinVer" Version="4.*" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Reference Include="Assembly-CSharp" Publicize="true" PrivateAssets="all"/>
-            <HintPath>$(DependenciesDirectory)\Assembly-CSharp.dll</HintPath>
+    <ItemGroup Condition="$(CI) != 'true'">
+        <Reference Include="Assembly-CSharp" Publicize="true" PrivateAssets="all">
+            <HintPath>$(DependenciesDirectory)Assembly-CSharp.dll</HintPath>
         </Reference>
+        <Reference Include="Unity.Netcode.Runtime" PrivateAssets="all">
+            <HintPath>$(DependenciesDirectory)Unity.Netcode.Runtime.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup Condition="$(CI) == 'true'">
+        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="49.0.0-alpha.1" Publicize="true" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -34,7 +50,23 @@
         <EmbeddedResource Include="assets\*" />
     </ItemGroup>
 
-    <Target Name="CopyFiles" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\UnityProject\Assets\Plugins" />
+    <Target Name="SetPluginVersion" BeforeTargets="AddGeneratedFile" DependsOnTargets="MinVer">
+        <PropertyGroup>
+            <PlainVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</PlainVersion>
+            <BepInExPluginVersion>$(PlainVersion)</BepInExPluginVersion>
+        </PropertyGroup>
+    </Target>
+
+    <Target
+            Name="ThunderstorePack"
+            AfterTargets="PostBuildEvent"
+            Condition="$(TargetFramework) == 'netstandard2.1' and $(Configuration) == 'Release'"
+            DependsOnTargets="NetcodePatch;SetPluginVersion"
+    >
+        <Exec Command="dotnet tcli build --config-path $(ProjectDir)../assets/thunderstore.toml --package-version $(PlainVersion)"/>
+        <ItemGroup>
+            <FilesToRename Include="$(ProjectDir)../dist/*-$(PlainVersion).zip"/>
+        </ItemGroup>
+        <Move SourceFiles="@(FilesToRename)" DestinationFiles="@(FilesToRename -&gt; Replace($(PlainVersion), $(MinVerVersion)))"/>
     </Target>
 </Project>
